@@ -133,6 +133,7 @@ def run_model(env,q,q_,epsilon,alpha,gamma, Experience,episodes):
         if(_%10==0):
             print('episode {}'.format(_))
         done=False
+        losses_printed=False
         env.reset()
         while(not done):                
             current_state=tf.constant(env.state)
@@ -152,7 +153,9 @@ def run_model(env,q,q_,epsilon,alpha,gamma, Experience,episodes):
                     loss=[]
                     for i in range(64):
                         loss.append(loss_fun(q_, gamma, states[i], actions[i][0], rewards[i][0], dones[i][0], next_states[i]))                        
-                print('Sum of rewards: {}    Loss: {}'.format(np.sum(rewards),np.sum(loss)))        
+                if(not losses_printed):
+                    losses_printed=True
+                    print('Sum of rewards: {}    Loss: {}'.format(np.sum(rewards),np.sum(loss)))       
                 grad=tape.gradient(loss,q.trainable_variables)
                 optimizer.apply_gradients(zip(grad,q.trainable_variables))
             else:
